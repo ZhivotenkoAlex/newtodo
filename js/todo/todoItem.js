@@ -39,18 +39,23 @@ class TodoItem {
   render() {
     const li = document.createElement("li")
     li.classList.add("todos__listItem")
-    li.setAttribute("id", this.item.id)
+    // li.setAttribute("id", this.item.id)
 
     const span = new this.Span()
-    span.span.classList.add("todos__title")
+    span.span.classList.add("todos__name")
     span.setInnerText(this.item.title)
 
-    this.item.checked ? span.span.classList.add("todos__title--checked") : ""
+    this.item.checked ? span.span.classList.add("todos__name--checked") : ""
 
     const checkbox = new this.CheckBox()
     checkbox.checkbox.classList.add("todos__checkBox")
     checkbox.checkbox.setAttribute("type", "checkbox")
+    checkbox.checkbox.setAttribute("id", this.item.id)
     this.item.checked ? checkbox.setStatus(true) : checkbox.setStatus(false)
+
+    const labelForCheckbox = document.createElement("label")
+    labelForCheckbox.setAttribute("for", this.item.id)
+    labelForCheckbox.classList.add("todos__label")
 
     const button = new this.Button("X")
     button.button.classList.add("todos__deleteButton")
@@ -58,7 +63,7 @@ class TodoItem {
 
     this.target
       .appendChild(li)
-      .append(span.span, checkbox.checkbox, button.button)
+      .append(button.button, checkbox.checkbox, labelForCheckbox, span.span)
 
     button.button.addEventListener("click", this.remove)
     checkbox.checkbox.addEventListener("click", this.setDone)

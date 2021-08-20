@@ -9,7 +9,6 @@ class Store {
 
   setItem(item) {
     this.todoStorage.push(item)
-    return console.log(this.todoStorage)
   }
 
   removeItem(id) {

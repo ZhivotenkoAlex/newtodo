@@ -78,11 +78,10 @@ class Login {
     } else if (!this.isLoggedIn()) {
       this.title.innerText = "Register"
       this.register(e)
+      this.LoginInput.textInput.value = ""
+      this.PasswordInput.passwordInput.value = ""
       document.body.innerHTML = ""
       this.emitter.emit("renderMain", {})
-      this.emitter.unsubscribe("renderLogin", (data) =>
-        loginPage.render(data.target)
-      )
     }
   }
 
@@ -109,7 +108,7 @@ class Login {
     this.PasswordInput.passwordInput.setAttribute("placeholder", "Password...")
     this.PasswordInput.passwordInput.setAttribute("id", "password")
 
-    this.Button.button.classList.add("login__button")
+    this.Button.button.classList.add("button")
     this.Button.button.setAttribute("type", "submit")
     this.Button.button.innerText = "Login"
     target.prepend(wraper)
@@ -124,9 +123,6 @@ class Login {
       e.preventDefault()
 
       this.authentification(e)
-      this.emitter.unsubscribe("renderLogin", (data) =>
-        loginPage.render(data.target)
-      )
     })
   }
 }

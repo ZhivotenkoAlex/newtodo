@@ -1,4 +1,4 @@
-import MainPage from "../eventEmitter.js/todo/mainPage.js"
+import MainPage from "./todo/mainPage.js"
 import LoginPage from "./register/loginPage.js"
 import Emitter from "./helpers/emitter.js"
 import Store from "./helpers/store.js"
@@ -14,6 +14,7 @@ const modalConfirm = new ModalConfirm(emitter, document.body)
 
 emitter.subscribe("renderLogin", (data) => loginPage.render(data.target))
 emitter.subscribe("renderMain", (data) => main.renderMainPage())
+
 emitter.subscribe("logOut", (data) => loginPage.render(data.target))
 
 emitter.subscribe("modalRender", (data) => modal.render())

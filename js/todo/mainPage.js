@@ -70,43 +70,41 @@ class MainPage {
     const main = document.createElement("div")
     main.classList.add("todos")
 
-    const functionsLink = document.createElement("a")
-    functionsLink.setAttribute("href", "../index.html")
-    functionsLink.innerText = "To functions"
+    const title = document.createElement("h1")
+    title.textContent = "TO-DO LIST"
+    title.classList.add("todos__title")
 
-    const classLink = document.createElement("a")
-    classLink.setAttribute("href", "./class.html")
-    classLink.innerText = "To OneEntryPoint"
+    const addButton = document.createElement("a")
+    addButton.setAttribute("href", "")
+    addButton.innerText = "ADD"
+    addButton.classList.add("todos__add")
 
     const textInput = new this.TextInput()
     textInput.textInput.classList.add("todos__input")
     textInput.textInput.setAttribute("id", "todosInput")
-
-    const button = new this.Button("Add todo")
-    button.button.classList.add("button")
-    button.button.setAttribute("id", "todosAddButton")
+    textInput.textInput.setAttribute("placeholder", "new task")
 
     const LogOutbutton = new this.Button("Log Out")
-    LogOutbutton.button.classList.add("button")
+    LogOutbutton.button.classList.add("button", "logout__button")
     LogOutbutton.button.setAttribute("id", "todosAddButton")
 
     this.todosBox.classList.add("todos__box")
+
     this.todosBox.setAttribute("id", "todosBox")
 
     this.todosList.classList.add("todos__list")
 
-    document.body.prepend(LogOutbutton.button, main)
-    main.prepend(textInput.textInput, button.button, this.todosBox)
-
-    this.todosBox.appendChild(this.todosList)
+    document.body.prepend(LogOutbutton.button, title, main, this.todosBox)
+    main.prepend(textInput.textInput, addButton),
+      this.todosBox.appendChild(this.todosList)
 
     LogOutbutton.button.addEventListener("click", () => {
       document.body.innerHTML = ""
       this.emitter.emit("renderLogin", { target: document.body })
-      this.emitter.unsubscribe("renderMain", (data) => main.renderMainPage())
     })
 
-    button.button.addEventListener("click", () => {
+    addButton.addEventListener("click", (e) => {
+      e.preventDefault()
       this.addTodoItem(textInput.textInput)
     })
 
@@ -118,6 +116,9 @@ class MainPage {
 
   renderTodoList() {
     this.todosList.innerHTML = ""
+    !this.store.todoStorage.length
+      ? this.todosBox.classList.add("todos__box--empty")
+      : this.todosBox.classList.remove("todos__box--empty")
     this.todos.forEach((item) => {
       let todoItem = new TodoItem({
         target: this.todosList,
