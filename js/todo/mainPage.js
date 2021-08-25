@@ -3,7 +3,8 @@ import Button from "../elements/button.js"
 import TodoItem from "./todoItem.js"
 
 class MainPage {
-  constructor(emitter, store) {
+  constructor(emitter, store, modal) {
+    this.modal = modal
     this.emitter = emitter
     this.store = store
     this.TextInput = TextInput
@@ -100,7 +101,8 @@ class MainPage {
 
     LogOutbutton.button.addEventListener("click", () => {
       document.body.innerHTML = ""
-      this.emitter.emit("renderLogin", { target: document.body })
+      this.store.mainRenderStatus = false
+      this.emitter.emit("page render", {})
     })
 
     addButton.addEventListener("click", (e) => {

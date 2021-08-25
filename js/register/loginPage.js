@@ -3,7 +3,8 @@ import PasswordInput from "../elements/passwordInput.js"
 import Button from "../elements/button.js"
 
 class Login {
-  constructor(emitter) {
+  constructor(emitter, store) {
+    this.store = store
     this.emitter = emitter
     this.LoginInput = new TextInput()
     this.PasswordInput = new PasswordInput()
@@ -81,7 +82,8 @@ class Login {
       this.LoginInput.textInput.value = ""
       this.PasswordInput.passwordInput.value = ""
       document.body.innerHTML = ""
-      this.emitter.emit("renderMain", {})
+      this.store.mainRenderStatus = true
+      this.emitter.emit("page render", {})
     }
   }
 
@@ -118,7 +120,7 @@ class Login {
       this.PasswordInput.passwordInput,
       this.Button.button
     )
-
+    this.emitter.emit("modalRender", { target: document.body, message: "Test" })
     wraper.addEventListener("submit", (e) => {
       e.preventDefault()
 

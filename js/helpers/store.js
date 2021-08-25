@@ -1,6 +1,7 @@
 class Store {
   constructor() {
     this.todoStorage = []
+    this.mainRenderStatus = false
   }
 
   getItem(id) {
