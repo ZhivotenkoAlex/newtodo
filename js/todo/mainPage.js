@@ -3,8 +3,8 @@ import Button from "../elements/button.js"
 import TodoItem from "./todoItem.js"
 
 class MainPage {
-  constructor(emitter, store, modal) {
-    this.modal = modal
+  constructor(emitter, store, api) {
+    this.api = api
     this.emitter = emitter
     this.store = store
     this.TextInput = TextInput
@@ -13,17 +13,17 @@ class MainPage {
     this.todosBox = document.createElement("div")
     this.todosList = document.createElement("ul")
     this.todos = this.store.todoStorage || []
+    this.tokens = ""
   }
 
   addTodoItem(input) {
     if (input.value) {
       let newTodo = {
         title: input.value,
-        checked: false,
-        id: Date.now(),
+        token: `Bearer ${this.tokens.accessToken}`,
       }
-      this.store.setItem(newTodo)
 
+      this.api.post("/api/todo", newTodo)
       input.value = ""
       this.renderTodoList()
     } else
@@ -32,42 +32,50 @@ class MainPage {
       })
   }
 
-  setTodoItemStatusDone = (id) => {
-    let targetId = id
-
-    for (const [index, item] of this.todos.entries()) {
-      if (item.id === targetId) {
-        this.todos[index].checked === false
-          ? (this.todos[index].checked = true)
-          : (this.todos[index].checked = false)
-        this.renderTodoList()
-      }
-    }
-  }
-
-  deleteTodoItem = (id) => {
-    let targetId = id
-
-    for (const [index, item] of this.todos.entries()) {
-      if (item.id === targetId) {
-        this.todos.splice(index, 1)
-      }
-    }
-    this.renderTodoList()
-  }
-
-  editTodoItem = (id, e) => {
-    let targetId = id
-    for (const [index, item] of this.todos.entries()) {
-      if (item.id === targetId) {
-        this.todos[index].title = e.target.innerText
-      }
+  setTodoItemStatusDone = async (id) => {
+    const todo = await this.api.getById({
+      id,
+      token: this.tokens.accessToken,
+    })
+    const data = {
+      id,
+      checked: !todo.checked,
+      token: `Bearer ${this.tokens.accessToken}`,
     }
 
-    this.renderTodoList()
+    await this.api.put("/api/todo/check", data)
+
+    await this.renderTodoList()
   }
 
-  renderMainPage() {
+  deleteTodoItem = async (id) => {
+    this.api.delete("/api/todo", {
+      id,
+      token: `Bearer ${this.tokens.accessToken}`,
+    })
+    await this.renderTodoList()
+  }
+
+  editTodoItem = async (id, e) => {
+    await this.api.put("/api/todo", {
+      id,
+      title: e.target.innerText,
+      token: `Bearer ${this.tokens.accessToken}`,
+    })
+
+    // let targetId = id
+    // for (const [index, item] of this.todos.entries()) {
+    //   if (item.id === targetId) {
+    //     this.todos[index].title = e.target.innerText
+    //   }
+    // }
+
+    await this.renderTodoList()
+  }
+
+  async renderMainPage() {
+    document.body.innerHTML = ""
+    this.tokens = await this.store.getToken()
     const main = document.createElement("div")
     main.classList.add("todos")
 
@@ -99,29 +107,35 @@ class MainPage {
     main.prepend(textInput.textInput, addButton),
       this.todosBox.appendChild(this.todosList)
 
-    LogOutbutton.button.addEventListener("click", () => {
+    LogOutbutton.button.addEventListener("click", async () => {
       document.body.innerHTML = ""
       this.store.mainRenderStatus = false
-      this.emitter.emit("page render", {})
+      await this.emitter.emit("page render", {})
     })
 
     addButton.addEventListener("click", (e) => {
       e.preventDefault()
+
       this.addTodoItem(textInput.textInput)
     })
 
     if (this.todos) {
-      this.renderTodoList()
+      await this.renderTodoList()
     }
     this.emitter.emit("modalRender", {})
   }
 
-  renderTodoList() {
+  async renderTodoList() {
+    console.log("renderTodoList")
     this.todosList.innerHTML = ""
-    !this.store.todoStorage.length
+    const todos = await this.api.getItems(this.tokens.accessToken)
+    console.log(todos)
+    !todos.length
       ? this.todosBox.classList.add("todos__box--empty")
       : this.todosBox.classList.remove("todos__box--empty")
-    this.todos.forEach((item) => {
+
+    todos.forEach((item) => {
+      console.log(item.checked)
       let todoItem = new TodoItem({
         target: this.todosList,
         deleteTodoItem: this.deleteTodoItem,

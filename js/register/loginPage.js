@@ -3,9 +3,10 @@ import PasswordInput from "../elements/passwordInput.js"
 import Button from "../elements/button.js"
 
 class Login {
-  constructor(emitter, store) {
+  constructor(emitter, store, api) {
     this.store = store
     this.emitter = emitter
+    this.api = api
     this.LoginInput = new TextInput()
     this.PasswordInput = new PasswordInput()
     this.Button = new Button()
@@ -15,8 +16,7 @@ class Login {
   }
 
   checkRepeat = () => {
-    const login = this.LoginInput.textInput.value
-    // const password = this.PasswordInput.passwordInput.value
+    let login = this.LoginInput.textInput.value
     if (this.storage === null) {
       return false
     } else {
@@ -25,35 +25,47 @@ class Login {
     }
   }
 
-  isLoggedIn = () => {
-    // e.preventDefault()
-    const login = this.LoginInput.textInput.value
-    const password = this.PasswordInput.passwordInput.value
-    if (!this.storage) {
-      return false
-    } else {
-      let isUserLoggedIn = this.storage.find(
-        (item) => item.login === login && item.password === password
-      )
-      return isUserLoggedIn ? true : false
+  isLoggedIn = async () => {
+    let email = this.LoginInput.textInput.value
+    try {
+      const user = await this.api.getUser(email)
+      return user ? true : false
+    } catch (error) {
+      console.log(error)
     }
   }
 
-  register = (e) => {
-    // e.preventDefault()
+  login = async (e) => {
+    try {
+      const tokens = await this.api.post("/login", {
+        email: this.LoginInput.textInput.value,
+        password: this.PasswordInput.passwordInput.value,
+      })
 
-    const user = {
-      id: Date.now(),
-      login: this.LoginInput.textInput.value,
-      password: this.PasswordInput.passwordInput.value,
+      this.store.setToken(tokens)
+    } catch (error) {
+      console.log(error)
     }
-    this.users.push(user)
-    localStorage.setItem("storage", JSON.stringify(this.users))
   }
 
-  authentification = (e) => {
+  register = async (e) => {
+    try {
+      this.api.post("/auth", {
+        email: this.LoginInput.textInput.value,
+        password: this.PasswordInput.passwordInput.value,
+      })
+      this.emitter.emit("openModal", {
+        message: `User ${this.LoginInput.textInput.value} was added`,
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  authentification = async (e) => {
     e.preventDefault()
 
+    const isLoggedIn = await this.isLoggedIn()
     const messageNotRegistred =
       "You are not registred yet. Do you want to register with the current data?"
     const messageEmptyFields = "Please, enter your email and password"
@@ -76,14 +88,14 @@ class Login {
       this.emitter.emit("openModal", {
         message: messagePasswordLength,
       })
-    } else if (!this.isLoggedIn()) {
-      this.title.innerText = "Register"
+    } else if (isLoggedIn === true) {
+      const tokens = await this.login(e)
+      this.store.mainRenderStatus = true
+      this.emitter.emit("page render", {})
+    } else if (isLoggedIn === false) {
       this.register(e)
       this.LoginInput.textInput.value = ""
       this.PasswordInput.passwordInput.value = ""
-      document.body.innerHTML = ""
-      this.store.mainRenderStatus = true
-      this.emitter.emit("page render", {})
     }
   }
 

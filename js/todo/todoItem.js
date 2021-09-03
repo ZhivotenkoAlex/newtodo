@@ -39,11 +39,10 @@ class TodoItem {
   render() {
     const li = document.createElement("li")
     li.classList.add("todos__listItem")
-    // li.setAttribute("id", this.item.id)
 
     const span = new this.Span()
     span.span.classList.add("todos__name")
-    span.setInnerText(this.item.title)
+    span.setInnerText(this.item.text)
 
     this.item.checked ? span.span.classList.add("todos__name--checked") : ""
 
@@ -51,6 +50,8 @@ class TodoItem {
     checkbox.checkbox.classList.add("todos__checkBox")
     checkbox.checkbox.setAttribute("type", "checkbox")
     checkbox.checkbox.setAttribute("id", this.item.id)
+    console.log("todo item render")
+
     this.item.checked ? checkbox.setStatus(true) : checkbox.setStatus(false)
 
     const labelForCheckbox = document.createElement("label")

@@ -2,6 +2,7 @@ class Store {
   constructor() {
     this.todoStorage = []
     this.mainRenderStatus = false
+    this.tokens = ""
   }
 
   getItem(id) {
@@ -14,6 +15,19 @@ class Store {
 
   removeItem(id) {
     this.todoStorage.filter((item) => id === item.id)
+  }
+
+  setToken(item) {
+    this.tokens = item
+
+    return "Tokens are saved"
+  }
+  async getToken() {
+    try {
+      return this.tokens
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 export default Store
