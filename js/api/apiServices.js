@@ -13,10 +13,10 @@ class ApiServises {
       .catch((e) => console.log(e))
   }
 
-  async put(endPoint, data) {
+  async patch(endPoint, data) {
     console.log(data)
     const response = await fetch(`${this.http}${endPoint}`, {
-      method: "PUT",
+      method: "PATCH",
       body: JSON.stringify(data),
     })
     return response.json()
@@ -27,15 +27,13 @@ class ApiServises {
       method: "DELETE",
       body: JSON.stringify(data),
     })
-    console.log("==data ApiServises.delete")
-    console.log(data)
     return response.json()
   }
 
   async getById(data) {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/todo?id=${data.id}&Authorization=${data.token}`
+        `http://localhost:8080/api/todo/id?id=${data.id}&Authorization=${data.token}`
       )
       return response.json()
     } catch (error) {
@@ -44,15 +42,13 @@ class ApiServises {
   }
 
   getItems(data) {
-    return fetch(
-      `http://localhost:8080/api/todo/user?Authorization=Bearer ${data}`
-    )
+    return fetch(`http://localhost:8080/api/todo?Authorization=Bearer ${data}`)
       .then((res) => res.clone().json())
       .catch((e) => console.log(e.message))
   }
 
   getUser(data) {
-    return fetch(`${this.http}/user?email=${data}`)
+    return fetch(`${this.http}/api/user?item=${data}`)
       .then((res) => res.clone().json())
       .catch((e) => console.log(e.message))
   }

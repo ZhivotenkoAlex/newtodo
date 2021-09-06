@@ -50,7 +50,6 @@ class TodoItem {
     checkbox.checkbox.classList.add("todos__checkBox")
     checkbox.checkbox.setAttribute("type", "checkbox")
     checkbox.checkbox.setAttribute("id", this.item.id)
-    console.log("todo item render")
 
     this.item.checked ? checkbox.setStatus(true) : checkbox.setStatus(false)
 

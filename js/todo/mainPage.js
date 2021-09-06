@@ -35,15 +35,17 @@ class MainPage {
   setTodoItemStatusDone = async (id) => {
     const todo = await this.api.getById({
       id,
-      token: this.tokens.accessToken,
+      token: `Bearer ${this.store.tokens.accessToken}`,
     })
+    console.log("todo")
+    console.log(todo)
     const data = {
       id,
       checked: !todo.checked,
-      token: `Bearer ${this.tokens.accessToken}`,
+      token: `Bearer ${this.store.tokens.accessToken}`,
     }
 
-    await this.api.put("/api/todo/check", data)
+    await this.api.patch("/api/todo/check", data)
 
     await this.renderTodoList()
   }
@@ -57,7 +59,7 @@ class MainPage {
   }
 
   editTodoItem = async (id, e) => {
-    await this.api.put("/api/todo", {
+    await this.api.patch("/api/todo/title", {
       id,
       title: e.target.innerText,
       token: `Bearer ${this.tokens.accessToken}`,
@@ -126,16 +128,13 @@ class MainPage {
   }
 
   async renderTodoList() {
-    console.log("renderTodoList")
     this.todosList.innerHTML = ""
     const todos = await this.api.getItems(this.tokens.accessToken)
-    console.log(todos)
     !todos.length
       ? this.todosBox.classList.add("todos__box--empty")
       : this.todosBox.classList.remove("todos__box--empty")
 
     todos.forEach((item) => {
-      console.log(item.checked)
       let todoItem = new TodoItem({
         target: this.todosList,
         deleteTodoItem: this.deleteTodoItem,

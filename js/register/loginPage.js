@@ -26,8 +26,8 @@ class Login {
   }
 
   isLoggedIn = async () => {
-    let email = this.LoginInput.textInput.value
     try {
+      let email = this.LoginInput.textInput.value
       const user = await this.api.getUser(email)
       return user ? true : false
     } catch (error) {
@@ -37,11 +37,10 @@ class Login {
 
   login = async (e) => {
     try {
-      const tokens = await this.api.post("/login", {
+      const tokens = await this.api.post("/api/auth/login", {
         email: this.LoginInput.textInput.value,
         password: this.PasswordInput.passwordInput.value,
       })
-
       this.store.setToken(tokens)
     } catch (error) {
       console.log(error)
@@ -50,7 +49,7 @@ class Login {
 
   register = async (e) => {
     try {
-      this.api.post("/auth", {
+      this.api.post("/api/user", {
         email: this.LoginInput.textInput.value,
         password: this.PasswordInput.passwordInput.value,
       })
@@ -135,7 +134,6 @@ class Login {
     this.emitter.emit("modalRender", { target: document.body, message: "Test" })
     wraper.addEventListener("submit", (e) => {
       e.preventDefault()
-
       this.authentification(e)
     })
   }
